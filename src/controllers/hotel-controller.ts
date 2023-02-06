@@ -6,8 +6,8 @@ import { AuthenticatedRequest } from "@/middlewares";
 export async function getHotels(_req: AuthenticatedRequest, res: Response) {
     try {
         const userId = _req.userId;
-        const event = await HotelsService.getHotels(userId);
-        return res.status(httpStatus.OK).send(event);
+        const hotels = await HotelsService.getHotels(userId);
+        return res.status(httpStatus.OK).send(hotels);
     } catch (error) {
         if(error.name === "paymentError"){
             return res.status(httpStatus.PAYMENT_REQUIRED).send();
@@ -28,7 +28,9 @@ export async function getHotelWithRooms(_req: AuthenticatedRequest, res: Respons
         const hotel = await HotelsService.getHotelWithRooms(userId,Number(hotelId));
         return res.status(httpStatus.OK).send(hotel);
     } catch (error) {
-        
-        return res.status(httpStatus.NOT_FOUND).send({});
+        if(error.name === "paymentError"){
+            return res.status(httpStatus.PAYMENT_REQUIRED).send();
+        }
+        return res.status(httpStatus.NOT_FOUND).send();
     }
 }
